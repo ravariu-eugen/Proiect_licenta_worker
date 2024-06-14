@@ -1,0 +1,11 @@
+service Worker {
+    rpc Task(WorkerRequest) returns (WorkerResponse) ;
+}
+
+message WorkerRequest {
+    int32 task_index = 1;
+}
+
+message WorkerResponse {
+    int32 result = 1;
+}
