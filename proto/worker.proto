@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option go_package = "google.golang.org/grpc/examples/helloworld/helloworld";
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.helloworld";
+option java_outer_classname = "HelloWorldProto";
+
+package worker;
+
+
+service Worker {
+    rpc SetCredentials(Credentials) returns (WorkerResponse) ;
+    rpc TaskRequest(stream WorkerRequest) returns (stream WorkerResponse);
+    rpc SystemInfo() returns (SystemInfo) ;
+    rpc Shutdown() returns (WorkerResponse) ;
+}
+
+
+
+
+message Credentials {
+    string aws_access_key_id = 1;
+    string aws_secret_access_key = 2; 
+}
+
+message WorkerRequest {
+    int32 task_index = 1;
+}
+
+message WorkerResponse {
+    int32 task_index = 1;
+    string result = 2;
+}
+
+
+message SystemInfo {
+    string cpu = 1;
+    string memory = 2;
+}
