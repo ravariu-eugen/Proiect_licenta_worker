@@ -16,6 +16,7 @@ jobs:
       - name: Build
         run: |
           cd ./src
+          rm worker
           go get 
           go build -v -o ./worker
           pwd
