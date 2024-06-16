@@ -3,11 +3,7 @@
 
 name: Go
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+on: push
 permissions:
   contents: write
 jobs:
@@ -28,9 +24,10 @@ jobs:
         go get 
         go build -v .
 
-     - name: Commit report
+     - name: Commit push
         run: |
           git config --global user.name 'ravariu-eugen'
           git config --global user.email 'eugen.ravariu@stud.acs.upb.ro'
-          git commit -am "Automated report"
+          git add .
+          git commit -am "Created binary"
           git push
