@@ -23,7 +23,7 @@ jobs:
 
     - name: Build
       run: |
-        go get -d ./...
+        go get -d ./src/go.mod
         go build -v ./src/main.go
 
     - name: Commit files
