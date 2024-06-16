@@ -22,7 +22,7 @@ jobs:
           go get 
           go build -v -o ./worker
           ls -l
-      - uses: actions/checkout@v3
+      
       - name: Commit report
         run: |
           git config --global user.name 'ravariu-eugen'
