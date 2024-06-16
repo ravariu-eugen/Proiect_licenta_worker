@@ -6,26 +6,26 @@ on: push
 permissions:
   contents: write
 jobs:
-  ru:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.22'
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
 
-    - name: Build
-      run: |
-        cd ./src
-        go get 
-        go build -v .
-
-     - name: Commit push
+      - name: Build
         run: |
-          git config --global user.name 'ravariu-eugen'
-          git config --global user.email 'eugen.ravariu@stud.acs.upb.ro'
-          git add .
-          git commit -am "Created binary"
-          git push
+          cd ./src
+          go get 
+          go build -v .
+
+      - name: Commit push
+          run: |
+            git config --global user.name 'ravariu-eugen'
+            git config --global user.email 'eugen.ravariu@stud.acs.upb.ro'
+            git add .
+            git commit -am "Created binary"
+            git push
