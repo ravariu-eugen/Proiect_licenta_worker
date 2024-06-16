@@ -63,7 +63,7 @@ func downloadFile(bucketName, filename, destinationFolder string) error {
 	return nil
 }
 
-func unarchiveFile(bucketName, filepath, destinationFolder string) error {
+func unarchiveFile(filepath, destinationFolder string) error {
 
 	filename := filepath[strings.LastIndex(filepath, "/")+1:]
 	fileType := filename[:strings.Index(filepath, ".")]
