@@ -22,7 +22,9 @@ jobs:
         go-version: '1.22'
 
     - name: Build
-      run: go build -v ./src/main.go
+      run: |
+        go mod download
+        go build -v ./src/main.go
 
     - name: Commit files
       id: commit

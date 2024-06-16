@@ -1,4 +1,4 @@
-module github.com/ravariu-eugen/Proiect_licenta_worker/worker
+module github.com/ravariu-eugen/Proiect_licenta_worker/src
 
 go 1.22.3
 
