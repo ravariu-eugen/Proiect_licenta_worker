@@ -18,7 +18,6 @@ jobs:
           cd ./src
           go get 
           go build -v -o ./worker
-          touch ./work
           pwd
           ls -l
       - uses: actions/checkout@v3

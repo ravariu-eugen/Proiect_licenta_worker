@@ -16,7 +16,7 @@ const (
 func runContainerServer() error {
 	router := gin.Default()
 	router.GET("/", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "Hello, World!")
+		ctx.String(http.StatusOK, "Hello, World!!!!")
 	})
 	router.GET("/system_info", getSystemInfo)
 
