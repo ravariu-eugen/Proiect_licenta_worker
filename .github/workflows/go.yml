@@ -8,7 +8,8 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+permissions:
+  contents: write
 jobs:
 
   build:
@@ -27,21 +28,9 @@ jobs:
         go get 
         go build -v .
 
-    - name: Commit files
-      id: commit
-      run: |
-        git config --local user.email "eugen.ravariu@stud.acs.upb.ro"
-        git config --local user.name "ravariu-eugen"
-        git add --all
-        if [-z "$(git status --porcelain)"]; then
-          echo "::set-output name=push::false"
-        else
-          git commit -m "Add changes" -a
-          echo "::set-output name=push::true"
-        fi
-      shell: bash
-    - name: Push changes
-      if: steps.commit.outputs.push == 'true'
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+     - name: Commit report
+        run: |
+          git config --global user.name 'ravariu-eugen'
+          git config --global user.email 'eugen.ravariu@stud.acs.upb.ro'
+          git commit -am "Automated report"
+          git push
