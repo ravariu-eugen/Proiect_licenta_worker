@@ -18,13 +18,13 @@ jobs:
           cd ./src
           go get 
           go build -v .
+          pwd
+          ls -l
       - uses: actions/checkout@v3
-      - name: Create report file
-        run: date +%s > report.txt
       - name: Commit report
         run: |
           git config --global user.name 'ravariu-eugen'
           git config --global user.email 'eugen.ravariu@stud.acs.upb.ro'
           git add .
-          git commit -am "Automated report"
+          git commit -am "Automated compile"
           git push
