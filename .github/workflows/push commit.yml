@@ -16,10 +16,11 @@ jobs:
       - name: Build
         run: |
           cd ./src
+          pwd
           rm worker
+          ls -l
           go get 
           go build -v -o ./worker
-          pwd
           ls -l
       - uses: actions/checkout@v3
       - name: Commit report
