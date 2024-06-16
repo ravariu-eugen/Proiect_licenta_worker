@@ -17,13 +17,12 @@ jobs:
         run: |
           cd ./src
           pwd
-          rm worker
           ls -l
           go get 
-          go build -v -o ./worker
+          go build -v -o ../worker
           ls -l
       
-      - name: Commit report
+      - name: Commit 
         run: |
           git config --global user.name 'ravariu-eugen'
           git config --global user.email 'eugen.ravariu@stud.acs.upb.ro'
