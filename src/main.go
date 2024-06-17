@@ -18,7 +18,11 @@ func runContainerServer() error {
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "Hello, World!!!!")
 	})
+
 	router.GET("/system_info", getSystemInfo)
+	router.POST("/images/registry", GetRegistryImage)
+	router.POST("/images/archive", GetArchiveImage)
+	router.POST("/aws_setup", SetAWSCredentials)
 
 	return router.Run(":8080")
 }

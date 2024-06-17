@@ -3,6 +3,7 @@ module github.com/ravariu-eugen/Proiect_licenta_worker/src
 go 1.22.3
 
 require (
+	github.com/KyleBanks/dockerstats v0.0.0-20230525155409-5a20400da8a2
 	github.com/aws/aws-sdk-go-v2 v1.27.2
 	github.com/aws/aws-sdk-go-v2/config v1.27.18
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.18

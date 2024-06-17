@@ -1,3 +1,5 @@
+github.com/KyleBanks/dockerstats v0.0.0-20230525155409-5a20400da8a2 h1:MX2thoIy5+5kRek43VAA9wxRcHcGjm0iJyiarUq/GOI=
+github.com/KyleBanks/dockerstats v0.0.0-20230525155409-5a20400da8a2/go.mod h1:93Q/nFFqAIISN2SRl4XjArIA0a6Bla+PfjP/ixU5BDw=
 github.com/aws/aws-sdk-go-v2 v1.27.2 h1:pLsTXqX93rimAOZG2FIYraDQstZaaGVVN4tNw65v0h8=
 github.com/aws/aws-sdk-go-v2 v1.27.2/go.mod h1:ffIFB97e2yNsv4aTSGkqtHnppsIJzw7G7BReUZ3jCXM=
 github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.2 h1:x6xsQXGSmW6frevwDA+vi/wqhp1ct18mVXYN08/93to=

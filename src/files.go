@@ -29,7 +29,7 @@ func downloadFile(bucketName, filename, destinationFolder string) error {
 		context.TODO(),
 		config.WithRegion("eu-west-1"),
 		config.WithCredentialsProvider(
-			credentials.NewStaticCredentialsProvider(cred.AccessKeyID, cred.SecretAccessKey, "")))
+			credentials.NewStaticCredentialsProvider(awsCred.AccessKeyID, awsCred.SecretAccessKey, "")))
 
 	if err != nil {
 		return err

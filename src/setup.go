@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Credentials struct {
+type AWSCredentials struct {
 	AccessKeyID     string `json:"accessKeyID"`
 	SecretAccessKey string `json:"secretAccessKey"`
 }
@@ -19,22 +19,38 @@ type JobInfo struct {
 	SharedFiles []string `json:"sharedFiles"`
 }
 
-var cred Credentials
+// needed credentials
+
+// aws credentials:
+//   - access key id
+//   - secret access key
+
+// container registry credentials:
+//   - username
+//   - password
+//   - registry
+
+// needed info:
+//   - executed image - either in registry or in file
+//   - input file
+//   - shared files
+//   - output file name
+
+var awsCred AWSCredentials
 var jobInfo JobInfo
 
-func setCredentials(awsAccessKey, awsSecretKey string) {
-
-	cred.AccessKeyID = awsAccessKey
-	cred.SecretAccessKey = awsSecretKey
+func SetAWSCredentials(c *gin.Context) {
+	if err := c.ShouldBindJSON(&awsCred); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": awsCred})
 }
 
-func setInstanceInfo(c *gin.Context) {
-
-	// sets instance info
-	c.JSON(http.StatusOK, gin.H{
-		"instanceId":      "i-1234567890abcdef0",
-		"instanceType":    "t2.micro",
-		"instanceState":   "running",
-		"publicIpAddress": "1.2.3.4",
-	})
+func SetJobInfo(c *gin.Context) {
+	if err := c.ShouldBindJSON(&jobInfo); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": jobInfo})
 }
