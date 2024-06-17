@@ -3,7 +3,7 @@ on: push
 permissions:
   contents: write
 jobs:
-  report:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,11 +16,8 @@ jobs:
       - name: Build
         run: |
           cd ./src
-          pwd
-          ls -l
           go get 
           go build -v -o ../worker
-          ls -l
       
       - name: Commit 
         run: |
