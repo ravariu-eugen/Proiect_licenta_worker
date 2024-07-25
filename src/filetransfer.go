@@ -80,17 +80,17 @@ func uploadFile(c *gin.Context, dst string) {
 		return
 	}
 	defer file.Close()
-
-	out, err := os.Create(dst + "/" + header.Filename)
+	newFile := dst + "/" + header.Filename
+	out, err := os.Create(newFile)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{" stage": 2, "error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"stage": 2, "file": newFile, "error": err.Error()})
 		return
 	}
 	defer out.Close()
 
 	_, err = io.Copy(out, file)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"  stage": 3, "error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"stage": 3, "error": err.Error()})
 		return
 	}
 
