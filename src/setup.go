@@ -6,19 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AWSCredentials struct {
-	AccessKeyID     string `json:"accessKeyID"`
-	SecretAccessKey string `json:"secretAccessKey"`
-}
-
-type JobInfo struct {
-	ImageName   string   `json:"imageName"`
-	ImageInFile bool     `json:"imageInFile"`
-	InputFile   string   `json:"inputFile"`
-	OutputFile  string   `json:"outputFile"`
-	SharedFiles []string `json:"sharedFiles"`
-}
-
 // needed credentials
 
 // aws credentials:
@@ -36,16 +23,15 @@ type JobInfo struct {
 //   - shared files
 //   - output file name
 
-var awsCred AWSCredentials
-var jobInfo JobInfo
-
-func SetAWSCredentials(c *gin.Context) {
-	if err := c.ShouldBindJSON(&awsCred); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"data": awsCred})
+type JobInfo struct {
+	ImageName   string   `json:"imageName"`
+	OutputFiles []string `json:"outputFiles"`
+	SharedFiles []string `json:"sharedFiles"`
 }
+
+type JobInfoMap map[string]JobInfo
+
+var jobInfo JobInfoMap = make(JobInfoMap)
 
 func SetJobInfo(c *gin.Context) {
 	if err := c.ShouldBindJSON(&jobInfo); err != nil {

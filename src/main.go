@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	InputFolder  = "/input"
-	SharedFolder = "/shared"
-	OutputFolder = "/output"
+	ImageFolder  = "/app/images"
+	InputFolder  = "/app/input"
+	SharedFolder = "/app/shared"
+	OutputFolder = "/app/output"
 )
 
 func runContainerServer() error {
@@ -19,10 +20,11 @@ func runContainerServer() error {
 		ctx.String(http.StatusOK, "Hello, World!!!!")
 	})
 
-	router.GET("/system_info", getSystemInfo)
-	router.POST("/images/registry", GetRegistryImage)
-	router.POST("/images/archive", GetArchiveImage)
-	router.POST("/aws_setup", SetAWSCredentials)
+	router.GET("/images", getImages)
+	router.POST("/images", addImage)
+
+	router.GET("/shared", getShared)
+	router.POST("/shared", addShared)
 
 	return router.Run(":8080")
 }

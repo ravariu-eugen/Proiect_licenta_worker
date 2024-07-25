@@ -69,7 +69,7 @@ func CreateTaskContainer(c *gin.Context) {
 		return
 	}
 
-	containerID, err := launchContainer(taskIndex, jobInfo.ImageName)
+	containerID, err := launchContainer(taskIndex, jobInfo[taskIndexSTR].ImageName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to launch container: " + err.Error(),
