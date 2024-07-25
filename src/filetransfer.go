@@ -76,21 +76,21 @@ func uploadFile(c *gin.Context, dst string) {
 	file, header, err := c.Request.FormFile("file")
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"stage": 1, "error": err.Error()})
 		return
 	}
 	defer file.Close()
 
 	out, err := os.Create(dst + "/" + header.Filename)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{" stage": 2, "error": err.Error()})
 		return
 	}
 	defer out.Close()
 
 	_, err = io.Copy(out, file)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"  stage": 3, "error": err.Error()})
 		return
 	}
 
