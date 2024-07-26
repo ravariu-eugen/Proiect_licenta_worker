@@ -66,6 +66,12 @@ func listFiles(dir string) ([]FileInfo, error) {
 				Name: file.Name(),
 				Size: info.Size(),
 			})
+		} else {
+
+			result = append(result, FileInfo{
+				Name: file.Name() + "/",
+				Size: 0,
+			})
 		}
 	}
 
