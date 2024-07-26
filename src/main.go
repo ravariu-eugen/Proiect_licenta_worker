@@ -2,9 +2,7 @@ package main
 
 import (
 	"log"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
+	"net"
 )
 
 const (
@@ -14,23 +12,35 @@ const (
 	OutputFolder = "/app/output"
 )
 
-func runContainerServer() error {
-	router := gin.Default()
-	router.GET("/", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "Hello, World!!!!")
-	})
-
-	router.GET("/images", getImages)
-	router.POST("/images", addImage)
-
-	router.GET("/shared", getShared)
-	router.POST("/shared", addShared)
-
-	return router.Run(":8080")
-}
-
 func main() {
-	if err := runContainerServer(); err != nil {
+
+	listener, err := net.Listen("tcp", ":8080")
+
+	if err != nil {
 		log.Fatal(err)
 	}
+
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Fatal(err)
+		}
+		go handleConnection(conn)
+	}
+}
+
+func handleConnection(conn net.Conn) {
+	// read data from the connection
+	buf := make([]byte, 1024)
+	_, err := conn.Read(buf)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	// write data back to the connection
+	conn.Write([]byte("Hello, client!"))
+
+	// close the connection
+	conn.Close()
 }
