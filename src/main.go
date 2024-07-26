@@ -37,9 +37,9 @@ func handleConnection(conn net.Conn) {
 		log.Fatal(err)
 		return
 	}
-
+	bufLen := len(string(buf))
 	// write data back to the connection
-	conn.Write([]byte("Hello, client!" + string(buf)))
+	conn.Write([]byte("Hello, client!" + string(bufLen) + string(buf)))
 
 	// close the connection
 	conn.Close()
