@@ -39,7 +39,7 @@ func handleConnection(conn net.Conn) {
 	}
 
 	// write data back to the connection
-	conn.Write([]byte("Hello, client!"))
+	conn.Write([]byte("Hello, client!" + string(buf)))
 
 	// close the connection
 	conn.Close()
