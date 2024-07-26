@@ -94,6 +94,8 @@ func uploadFile(c *gin.Context, dst string) {
 		return
 	}
 
+	extractInPlace(newFile)
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Uploaded the image successfully: " + header.Filename,
 	})

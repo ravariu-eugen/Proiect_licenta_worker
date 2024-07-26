@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -17,29 +18,42 @@ import (
 // Returns:
 //   - error: an error if the file download fails, otherwise nil (error)
 
-func unarchiveFile(filepath, destinationFolder string) error {
-
-	filename := filepath[strings.LastIndex(filepath, "/")+1:]
-	fileType := filename[:strings.Index(filepath, ".")]
-
-	err := os.MkdirAll(destinationFolder, os.ModePerm)
+func extractInPlace(file string) error {
+	// Extract the name of the archive
+	archiveName := filepath.Base(file)
+	// Remove the .zip extension
+	archiveName = archiveName[:len(archiveName)-len(".zip")]
+	// Create the destination folder
+	destinationFolder := filepath.Dir(file) + "/" + archiveName
+	fmt.Println(destinationFolder)
+	err := os.Mkdir(destinationFolder, 0755)
 	if err != nil {
 		return err
 	}
+
+	return extractFile(file, destinationFolder)
+}
+
+func extractFile(filepath, destinationFolder string) error {
+	file, err := os.Open(filepath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
 	var cmd *exec.Cmd
-	switch fileType {
-	case "tar":
-		cmd = exec.Command("tar", "-xf", filepath, "-C", destinationFolder)
-	case "zip":
-		cmd = exec.Command("unzip", filepath, "-d", destinationFolder)
+
+	switch {
+	case strings.HasSuffix(filepath, ".tar"):
+		cmd = exec.Command("tar", "-xf", "-", "-C", destinationFolder)
+		cmd.Stdin = file
+	case strings.HasSuffix(filepath, ".zip"):
+		cmd = exec.Command("unzip", "-d", destinationFolder)
+		cmd.Stdin = file
 	default:
-		return fmt.Errorf("unsupported file type: %s", fileType)
+		return fmt.Errorf("unsupported file type: %s", filepath)
 	}
 
-	err = cmd.Run()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
