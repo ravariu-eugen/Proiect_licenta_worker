@@ -36,7 +36,6 @@ func uploadAndExtractToDir(c *gin.Context, destinationDir string) (string, error
 	defer file.Close()
 
 	result, err := extractMultipartFile(header, destinationDir)
-	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	if err != nil {
 		return "", err
 	}

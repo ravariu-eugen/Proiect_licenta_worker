@@ -66,9 +66,9 @@ func extractMultipartFile(file *multipart.FileHeader, destinationFolder string) 
 	// get the extension
 	extension := filepath.Ext(file.Filename)
 	switch extension { // choose the correct command to execute
-	case "tar":
+	case ".tar":
 		cmd = exec.Command("tar", "-xf", "-", "-C", destinationFolder)
-	case "zip":
+	case ".zip":
 		cmd = exec.Command("unzip", "-d", destinationFolder)
 	default:
 		return "", fmt.Errorf("unsupported file type: %s", extension)
