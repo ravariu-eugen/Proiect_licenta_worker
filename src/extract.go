@@ -98,6 +98,5 @@ func extractMultipartFile(file *multipart.FileHeader, destinationFolder string) 
 		return "", err
 	}
 
-	extractFileFromPath(newFile, destinationFolder)
-	return newFile, nil
+	return extractFileFromPath(newFile, destinationFolder)
 }
