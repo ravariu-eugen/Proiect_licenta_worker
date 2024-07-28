@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"mime/multipart"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -55,5 +56,31 @@ func extractFile(file *os.File, destinationFolder string) (string, error) {
 
 	// get the path of the new directory
 	newDir := destinationFolder + "/" + filepath.Base(file.Name())
+	return newDir, cmd.Run()
+}
+
+func extractMultipartFile(file *multipart.FileHeader, destinationFolder string) (string, error) {
+
+	var cmd *exec.Cmd
+
+	// get the extension
+	extension := filepath.Ext(file.Filename)
+	switch extension { // choose the correct command to execute
+	case "tar":
+		cmd = exec.Command("tar", "-xf", "-", "-C", destinationFolder)
+	case "zip":
+		cmd = exec.Command("unzip", "-d", destinationFolder)
+	default:
+		return "", fmt.Errorf("unsupported file type: %s", extension)
+	}
+	con, err := file.Open()
+	if err != nil {
+		return "", err
+	}
+	cmd.Stdin = con
+	cmd.Stderr = os.Stderr
+
+	// get the path of the new directory
+	newDir := destinationFolder + "/" + filepath.Base(file.Filename)
 	return newDir, cmd.Run()
 }

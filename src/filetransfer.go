@@ -28,13 +28,14 @@ func uploadFile(c *gin.Context, destinationDir string) (string, error) {
 }
 
 func uploadAndExtractToDir(c *gin.Context, destinationDir string) (string, error) {
-	file, _, err := c.Request.FormFile("file")
+	file, header, err := c.Request.FormFile("file")
 
 	if err != nil {
 		return "", err
 	}
+	defer file.Close()
 
-	result, err := extractFile(file.(*os.File), destinationDir)
+	result, err := extractMultipartFile(header, destinationDir)
 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	if err != nil {
 		return "", err
