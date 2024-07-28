@@ -1,40 +1,31 @@
 package main
 
 import (
-	"errors"
 	"net/http"
+	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-func getFolderByIndex(folderPath string, taskIndex int) (string, error) {
-	directories, err := filepath.Glob(filepath.Join(folderPath, "*"))
-	if err != nil {
-		return "", err
-	}
+const (
+	containerInputFolder  = "/run/input"
+	containerOutputFolder = "/run/output"
+	containerSharedFolder = "/run/shared"
+)
 
-	if taskIndex < 0 || taskIndex >= len(directories) {
-		return "", errors.New("task index out of bounds")
-	}
+func launchContainer(imageName, job, task string) (string, error) {
 
-	return directories[taskIndex], nil
-}
+	// launches a container based on a task and an image
 
-func launchContainer(taskIndex int, imageName string) (string, error) {
+	taskInputDir := InputFolder + "/" + job + "/" + task
+	taskOutputDir := OutputFolder + "/" + job + "/" + task
 
-	input, err := getFolderByIndex(InputFolder, taskIndex)
-	if err != nil {
-		return "", err
-	}
-
-	cmd := exec.Command("docker", "run", "-d", "--rm", // Run in detached mode and remove container after it stops
-		"-v", InputFolder+"/"+input+":/input",
-		"-v", SharedFolder+":/shared",
-		"-v", OutputFolder+":/output",
+	cmd := exec.Command("docker", "run", "-d", // Run in detached mode and remove container after it stops
+		"-v", taskInputDir+":"+containerInputFolder,
+		"-v", SharedFolder+":"+containerSharedFolder,
+		"-v", taskOutputDir+":"+containerOutputFolder,
 		imageName)
 
 	output, err := cmd.Output()
@@ -49,92 +40,40 @@ func launchContainer(taskIndex int, imageName string) (string, error) {
 
 }
 
-var containerMap = make(map[int]string)
-
 func CreateTaskContainer(c *gin.Context) {
 
-	taskIndexSTR, ok := c.GetQuery("taskIndex")
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Missing taskIndex query parameter",
-		})
-		return
-	}
+	jobName := c.Request.FormValue("job")
+	image := c.Request.FormValue("image")
 
-	taskIndex, err := strconv.Atoi(taskIndexSTR)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid taskIndex query parameter",
-		})
-		return
-	}
-
-	containerID, err := launchContainer(taskIndex, jobInfo[taskIndexSTR].ImageName)
+	uploadDir := UploadFolder + "/" + jobName
+	err := os.MkdirAll(uploadDir, 0755)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to launch container: " + err.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
 
-	containerMap[taskIndex] = containerID
+	taskDir, err := uploadAndExtractToDir(c, uploadDir)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	taskName := filepath.Base(taskDir)
+
+	containerID, err := launchContainer(image, jobName, taskName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"taskIndex": taskIndex,
+		"containerID": containerID,
+		"taskName":    taskName,
+		"status":      "created",
 	})
-}
-
-func CheckTaskContainer(c *gin.Context) {
-
-	taskIndexSTR, ok := c.GetQuery("taskIndex")
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Missing taskIndex query parameter",
-		})
-		return
-	}
-
-	taskIndex, err := strconv.Atoi(taskIndexSTR)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid taskIndex query parameter",
-		})
-		return
-	}
-
-	containerID, ok := containerMap[taskIndex]
-	if !ok {
-		c.JSON(http.StatusOK, gin.H{
-			"taskIndex": taskIndex,
-			"status":    "not created",
-		})
-		return
-	}
-
-	cmd := exec.Command("docker", "inspect", "-f", "{{.State.Running}} {{.State.ExitCode}}", containerID)
-	output, err := cmd.Output()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to check container status: " + err.Error(),
-		})
-		return
-	}
-
-	substrings := strings.Split(string(output), " ")
-	isRunning := substrings[0] == "true"
-	exitCode, _ := strconv.Atoi(substrings[1])
-
-	if isRunning {
-		c.JSON(http.StatusOK, gin.H{
-			"taskIndex": taskIndex,
-			"status":    "running",
-			"exitCode":  exitCode,
-		})
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"taskIndex": taskIndex,
-			"status":    "finished",
-			"exitCode":  exitCode,
-		})
-	}
 
 }

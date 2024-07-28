@@ -1,32 +1,41 @@
 package main
 
 import (
-	"io"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
 )
 
-func addImage(c *gin.Context) {
+// uploadFile uploads a file to the server.
+//
+// It takes a gin.Context as a parameter and returns a string and an error.
+// The string is the path of the uploaded file, and the error is any error that occurred during the upload.
+func uploadFile(c *gin.Context, destinationDir string) (string, error) {
+	_, header, err := c.Request.FormFile("file")
 
-	// adds an image archive to the /app/images folder
+	if err != nil {
+		return "", err
+	}
 
-	uploadFile(c, ImageFolder)
+	newFile := destinationDir + "/" + header.Filename
+	err = c.SaveUploadedFile(header, newFile)
+	if err != nil {
+		return "", err
+	}
+	return newFile, nil
+
 }
 
-func addShared(c *gin.Context) {
+func uploadAndExtractToDir(c *gin.Context, destinationDir string) (string, error) {
+	file, _, err := c.Request.FormFile("file")
 
-	uploadFile(c, SharedFolder)
+	if err != nil {
+		return "", err
+	}
 
-}
+	return extractFile(file.(*os.File), destinationDir)
 
-func getImages(c *gin.Context) {
-	getFileList(c, ImageFolder)
-}
-
-func getShared(c *gin.Context) {
-	getFileList(c, SharedFolder)
 }
 
 func getFileList(c *gin.Context, dir string) {
@@ -76,34 +85,4 @@ func listFiles(dir string) ([]FileInfo, error) {
 	}
 
 	return result, nil
-}
-
-func uploadFile(c *gin.Context, dst string) {
-	file, header, err := c.Request.FormFile("file")
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"stage": 1, "error": err.Error()})
-		return
-	}
-	defer file.Close()
-	newFile := dst + "/" + header.Filename
-	out, err := os.Create(newFile)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"stage": 2, "file": newFile, "error": err.Error()})
-		return
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, file)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"stage": 3, "error": err.Error()})
-		return
-	}
-
-	extractInPlace(newFile)
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Uploaded the image successfully: " + header.Filename,
-	})
-
 }
