@@ -35,12 +35,7 @@ func uploadAndExtractToDir(c *gin.Context, destinationDir string) (string, error
 	}
 	defer file.Close()
 
-	result, err := extractMultipartFile(header, destinationDir)
-	if err != nil {
-		return "", err
-	}
-
-	return result, nil
+	return extractMultipartFile(header, destinationDir)
 
 }
 
