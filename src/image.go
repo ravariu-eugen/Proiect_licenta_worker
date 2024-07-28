@@ -12,11 +12,10 @@ func addImage(c *gin.Context) {
 
 	imageDir, err := uploadAndExtractToDir(c, ImageFolder)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error() + "||| " + imageDir})
 		return
 	}
 	imageName := filepath.Base(imageDir)
-	c.JSON(http.StatusInternalServerError, gin.H{"error": "not implemented"})
 	// build the image
 	err = buildImage(imageName, imageDir)
 	if err != nil {
