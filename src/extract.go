@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"mime/multipart"
 	"os"
 	"os/exec"
@@ -44,9 +45,9 @@ func extractFile(file *os.File, destinationFolder string) (string, error) {
 	// get the extension
 	extension := filepath.Ext(file.Name())
 	switch extension { // choose the correct command to execute
-	case "tar":
+	case ".tar":
 		cmd = exec.Command("tar", "-xf", "-", "-C", destinationFolder)
-	case "zip":
+	case ".zip":
 		cmd = exec.Command("unzip", "-d", destinationFolder)
 	default:
 		return "", fmt.Errorf("unsupported file type: %s", extension)
@@ -59,28 +60,44 @@ func extractFile(file *os.File, destinationFolder string) (string, error) {
 	return newDir, cmd.Run()
 }
 
-func extractMultipartFile(file *multipart.FileHeader, destinationFolder string) (string, error) {
+func saveLocal(file *multipart.FileHeader) (string, error) {
+	// create temporary folder
 
-	var cmd *exec.Cmd
-
-	// get the extension
-	extension := filepath.Ext(file.Filename)
-	switch extension { // choose the correct command to execute
-	case ".tar":
-		cmd = exec.Command("tar", "-xf", "-", "-C", destinationFolder)
-	case ".zip":
-		cmd = exec.Command("unzip", "-d", destinationFolder)
-	default:
-		return "", fmt.Errorf("unsupported file type: %s", extension)
+	tmpDir, err := os.MkdirTemp("", "temp")
+	if err != nil {
+		return "", err
 	}
+
+	newFile := tmpDir + "/" + filepath.Base(file.Filename)
 	con, err := file.Open()
 	if err != nil {
 		return "", err
 	}
-	cmd.Stdin = con
-	cmd.Stderr = os.Stderr
+	defer con.Close()
 
-	// get the path of the new directory
-	newDir := destinationFolder + "/" + filepath.Base(file.Filename)
-	return newDir, cmd.Run()
+	out, err := os.Create(newFile)
+	if err != nil {
+		return "", err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, con)
+	if err != nil {
+		return "", err
+	}
+
+	return newFile, nil
+
+}
+
+func extractMultipartFile(file *multipart.FileHeader, destinationFolder string) (string, error) {
+
+	// save the file
+	newFile, err := saveLocal(file)
+	if err != nil {
+		return "", err
+	}
+
+	extractFileFromPath(newFile, destinationFolder)
+	return newFile, nil
 }
