@@ -27,36 +27,24 @@ func extractInPlace(file string) (string, error) {
 // Returns:
 // - string: the path of the newly created directory where the extracted contents were placed.
 // - error: an error if the file could not be opened or if the file type is not supported.
-func extractFileFromPath(filepath, destinationFolder string) (string, error) {
+func extractFileFromPath(filePath, destinationFolder string) (string, error) {
 
-	// open the file
-	file, err := os.Open(filepath)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	return extractFile(file, destinationFolder)
-}
-
-func extractFile(file *os.File, destinationFolder string) (string, error) {
 	var cmd *exec.Cmd
 
 	// get the extension
-	extension := filepath.Ext(file.Name())
+	extension := filepath.Ext(filePath)
 	switch extension { // choose the correct command to execute
 	case ".tar":
-		cmd = exec.Command("tar", "-xf", "-", "-C", destinationFolder)
+		cmd = exec.Command("tar", "-xf", "-", "-C", destinationFolder, filePath)
 	case ".zip":
-		cmd = exec.Command("unzip", "-d", destinationFolder)
+		cmd = exec.Command("unzip", "-d", destinationFolder, filePath)
 	default:
 		return "", fmt.Errorf("unsupported file type: %s", extension)
 	}
-	cmd.Stdin = file
 	cmd.Stderr = os.Stderr
 
 	// get the path of the new directory
-	newDir := destinationFolder + "/" + filepath.Base(file.Name())
+	newDir := destinationFolder + "/" + filepath.Base(filePath)
 	return newDir, cmd.Run()
 }
 
@@ -97,6 +85,7 @@ func extractMultipartFile(file *multipart.FileHeader, destinationFolder string) 
 	if err != nil {
 		return "", err
 	}
+	defer os.Remove(newFile)
 
 	return extractFileFromPath(newFile, destinationFolder)
 }
