@@ -33,7 +33,7 @@ func uploadAndExtractToDir(c *gin.Context, destinationDir string) (string, error
 	if err != nil {
 		return "", err
 	}
-
+	c.JSON(http.StatusInternalServerError, gin.H{"error": "err.Error()1"})
 	return extractFile(file.(*os.File), destinationDir)
 
 }
