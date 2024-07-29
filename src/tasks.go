@@ -53,6 +53,10 @@ func launchContainer(imageName, job, task string) (string, error) {
 	taskInputDir := InputFolder + "/" + job + "/" + task
 	taskOutputDir := OutputFolder + "/" + job + "/" + task
 
+	if err := os.MkdirAll(taskOutputDir, 0755); err != nil {
+		return "", err
+	}
+
 	cmd := exec.Command("docker", "run", "-d", // Run in detached mode and remove container after it stops
 		"-v", taskInputDir+":"+containerInputFolder,
 		"-v", SharedFolder+":"+containerSharedFolder,
