@@ -25,13 +25,13 @@ func addImage(c *gin.Context) {
 }
 func getImages(c *gin.Context) {
 	cmd := exec.Command("docker", "image", "ls", "--format", "{{.Repository}}:{{.Tag}}")
-	out, err := cmd.Output()
+	_, err := cmd.Output()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"images": string(out)})
-
+	//c.JSON(http.StatusOK, gin.H{"images": string(out)})
+	getFileList(c, ImageFolder)
 }
 
 func buildImage(imageName, imageDir string) error {
