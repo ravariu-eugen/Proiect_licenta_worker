@@ -27,6 +27,7 @@ func runContainerServer() error {
 	router.GET("/shared", getShared)
 	router.POST("/shared", addShared)
 
+	router.GET("/tasks/:job/:task", getTask)
 	router.POST("/tasks", CreateTaskContainer)
 
 	return router.Run(":8080")

@@ -68,3 +68,9 @@ func CreateTaskContainer(c *gin.Context) {
 		"status":      "created",
 	})
 }
+
+func getTask(c *gin.Context) {
+	jobName := c.Param("job")
+	taskName := c.Param("task")
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "job": jobName, "task": taskName})
+}
