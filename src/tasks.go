@@ -59,7 +59,8 @@ func CreateTaskContainer(c *gin.Context) {
 
 	containerID, err := launchContainer(image, jobName, taskName)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error3": err.Error(), "dir": taskDir})
+		getFileList(c, taskDir)
+		//c.JSON(http.StatusInternalServerError, gin.H{"error3": err.Error(), "dir": taskDir})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
