@@ -141,7 +141,7 @@ func returnResult(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error: zip failed": err.Error()})
 		return
 	}
-	c.File(archivePath)
+	c.FileAttachment(archivePath, archiveName)
 	//c.JSON(http.StatusOK, gin.H{"message": "Downloaded the file successfully: " + archiveName})
 }
 
