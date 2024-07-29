@@ -142,7 +142,7 @@ func returnResult(c *gin.Context) {
 		return
 	}
 	c.File(archivePath)
-	c.JSON(http.StatusOK, gin.H{"message": "Downloaded the file successfully: " + archiveName})
+	//c.JSON(http.StatusOK, gin.H{"message": "Downloaded the file successfully: " + archiveName})
 }
 
 func getContainerStatus(containerID string) string {
