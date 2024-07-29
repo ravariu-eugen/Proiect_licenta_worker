@@ -46,20 +46,20 @@ func CreateTaskContainer(c *gin.Context) {
 
 	uploadDir := filepath.Join(UploadFolder, jobName)
 	if err := os.MkdirAll(uploadDir, 0755); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error1": err.Error()})
 		return
 	}
 
 	taskDir, err := uploadAndExtractToDir(c, uploadDir)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error()})
 		return
 	}
 	taskName := filepath.Base(taskDir)
 
 	containerID, err := launchContainer(image, jobName, taskName)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error3": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
