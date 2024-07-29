@@ -41,33 +41,25 @@ func launchContainer(imageName, job, task string) (string, error) {
 }
 
 func CreateTaskContainer(c *gin.Context) {
+	jobName := c.PostForm("job")
+	image := c.PostForm("image")
 
-	jobName := c.Request.FormValue("job")
-	image := c.Request.FormValue("image")
-
-	uploadDir := UploadFolder + "/" + jobName
-	err := os.MkdirAll(uploadDir, 0755)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+	uploadDir := filepath.Join(UploadFolder, jobName)
+	if err := os.MkdirAll(uploadDir, 0755); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	taskDir, err := uploadAndExtractToDir(c, uploadDir)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	taskName := filepath.Base(taskDir)
 
 	containerID, err := launchContainer(image, jobName, taskName)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -75,5 +67,4 @@ func CreateTaskContainer(c *gin.Context) {
 		"taskName":    taskName,
 		"status":      "created",
 	})
-
 }

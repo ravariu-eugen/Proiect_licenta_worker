@@ -28,15 +28,13 @@ func extractInPlace(file string) (string, error) {
 // - string: the path of the newly created directory where the extracted contents were placed.
 // - error: an error if the file could not be opened or if the file type is not supported.
 func extractFileFromPath(filePath, destinationFolder string) (string, error) {
-
+	extension := filepath.Ext(filePath)
+	newDir := filepath.Join(destinationFolder, filepath.Base(filePath))
 	var cmd *exec.Cmd
 
-	// get the extension
-	extension := filepath.Ext(filePath)
-	newDir := destinationFolder + "/" + filepath.Base(filePath)
-	switch extension { // choose the correct command to execute
+	switch extension {
 	case ".tar":
-		cmd = exec.Command("tar", "-xf", "-", "-C", newDir, filePath)
+		cmd = exec.Command("tar", "-xf", filePath, "-C", newDir)
 	case ".zip":
 		cmd = exec.Command("unzip", "-d", newDir, filePath)
 	default:
@@ -44,38 +42,37 @@ func extractFileFromPath(filePath, destinationFolder string) (string, error) {
 	}
 	cmd.Stderr = os.Stderr
 
-	// get the path of the new directory
-	return newDir, cmd.Run()
+	if err := cmd.Run(); err != nil {
+		return "", err
+	}
+
+	return newDir, nil
 }
 
 func saveLocal(file *multipart.FileHeader) (string, error) {
-	// create temporary folder
-
 	tmpDir, err := os.MkdirTemp("", "temp")
 	if err != nil {
 		return "", err
 	}
 
-	newFile := tmpDir + "/" + filepath.Base(file.Filename)
-	con, err := file.Open()
+	newFilePath := filepath.Join(tmpDir, filepath.Base(file.Filename))
+	src, err := file.Open()
 	if err != nil {
 		return "", err
 	}
-	defer con.Close()
+	defer src.Close()
 
-	out, err := os.Create(newFile)
+	dst, err := os.Create(newFilePath)
 	if err != nil {
 		return "", err
 	}
-	defer out.Close()
+	defer dst.Close()
 
-	_, err = io.Copy(out, con)
-	if err != nil {
+	if _, err = io.Copy(dst, src); err != nil {
 		return "", err
 	}
 
-	return newFile, nil
-
+	return newFilePath, nil
 }
 
 func extractMultipartFile(file *multipart.FileHeader, destinationFolder string) (string, error) {
