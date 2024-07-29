@@ -46,6 +46,30 @@ func CreateTaskContainer(c *gin.Context) {
 	})
 }
 
+type IDMap struct {
+	idmap map[string]string
+}
+
+var globalIDMap IDMap = IDMap{make(map[string]string)}
+
+func (idMap IDMap) getContainerID(jobName, taskName string) (containerID string) {
+
+	key := jobName + "-" + taskName
+
+	if val, ok := idMap.idmap[key]; ok {
+		return val
+	}
+
+	return ""
+}
+
+func (idMap IDMap) putContainerID(jobName, taskName, containerID string) {
+	key := jobName + "-" + taskName
+
+	idMap.idmap[key] = containerID
+
+}
+
 func launchContainer(imageName, job, task string) (string, error) {
 
 	// launches a container based on a task and an image
@@ -71,6 +95,8 @@ func launchContainer(imageName, job, task string) (string, error) {
 	containerID := string(output)
 	containerID = containerID[:len(containerID)-1] // Remove newline character
 
+	globalIDMap.putContainerID(job, task, containerID)
+
 	return containerID, nil
 
 }
@@ -78,5 +104,5 @@ func launchContainer(imageName, job, task string) (string, error) {
 func getTask(c *gin.Context) {
 	jobName := c.Param("job")
 	taskName := c.Param("task")
-	c.JSON(http.StatusOK, gin.H{"status": "ok", "job": jobName, "task": taskName})
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "job": jobName, "task": taskName, "containerID": globalIDMap.getContainerID(jobName, taskName)})
 }
