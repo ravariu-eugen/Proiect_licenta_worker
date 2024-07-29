@@ -104,5 +104,22 @@ func launchContainer(imageName, job, task string) (string, error) {
 func getTask(c *gin.Context) {
 	jobName := c.Param("job")
 	taskName := c.Param("task")
-	c.JSON(http.StatusOK, gin.H{"status": "ok", "job": jobName, "task": taskName, "containerID": globalIDMap.getContainerID(jobName, taskName)})
+	c.JSON(http.StatusOK, gin.H{
+		"job":         jobName,
+		"task":        taskName,
+		"containerID": globalIDMap.getContainerID(jobName, taskName),
+		"status":      getContainerStatus(globalIDMap.getContainerID(jobName, taskName)),
+	})
+}
+
+func getContainerStatus(containerID string) string {
+
+	cmd := exec.Command("docker", "container", "inspect", "-f", "{{.State.Status}}", containerID)
+
+	out, err := cmd.Output()
+
+	if err != nil {
+		return ""
+	}
+	return string(out)
 }
