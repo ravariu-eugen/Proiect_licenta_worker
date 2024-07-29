@@ -29,8 +29,8 @@ func extractInPlace(file string) (string, error) {
 // - error: an error if the file could not be opened or if the file type is not supported.
 func extractFileFromPath(filePath, destinationFolder string) (string, error) {
 	extension := filepath.Ext(filePath)
-	_ = getFileNameWithoutExt(filePath)
-	newDir := filepath.Join(destinationFolder, filepath.Base(filePath))
+	file := getFileNameWithoutExt(filePath)
+	newDir := filepath.Join(destinationFolder, file)
 	var cmd *exec.Cmd
 
 	switch extension {
