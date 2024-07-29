@@ -43,7 +43,7 @@ func extractFileFromPath(filePath, destinationFolder string) (string, error) {
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to extract file: %v", err)
 	}
 
 	return newDir, nil
@@ -80,7 +80,7 @@ func extractMultipartFile(file *multipart.FileHeader, destinationFolder string) 
 	// save the file
 	newFile, err := saveLocal(file)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to save file: %v", err)
 	}
 	defer os.Remove(newFile)
 
