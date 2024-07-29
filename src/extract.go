@@ -33,18 +33,18 @@ func extractFileFromPath(filePath, destinationFolder string) (string, error) {
 
 	// get the extension
 	extension := filepath.Ext(filePath)
+	newDir := destinationFolder + "/" + filepath.Base(filePath)
 	switch extension { // choose the correct command to execute
 	case ".tar":
-		cmd = exec.Command("tar", "-xf", "-", "-C", destinationFolder, filePath)
+		cmd = exec.Command("tar", "-xf", "-", "-C", newDir, filePath)
 	case ".zip":
-		cmd = exec.Command("unzip", "-d", destinationFolder, filePath)
+		cmd = exec.Command("unzip", "-d", newDir, filePath)
 	default:
 		return "", fmt.Errorf("unsupported file type: %s", extension)
 	}
 	cmd.Stderr = os.Stderr
 
 	// get the path of the new directory
-	newDir := destinationFolder + "/" + filepath.Base(filePath)
 	return newDir, cmd.Run()
 }
 
