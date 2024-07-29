@@ -17,7 +17,7 @@ func addImage(c *gin.Context) {
 	}
 	imageName := filepath.Base(imageDir)
 	// build the image
-	//err = buildImage(imageName, imageDir)
+	err = buildImage(imageName, imageDir)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error()})
 		return
