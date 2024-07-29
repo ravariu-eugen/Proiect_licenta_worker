@@ -104,12 +104,45 @@ func launchContainer(imageName, job, task string) (string, error) {
 func getTask(c *gin.Context) {
 	jobName := c.Param("job")
 	taskName := c.Param("task")
-	c.JSON(http.StatusOK, gin.H{
-		"job":         jobName,
-		"task":        taskName,
-		"containerID": globalIDMap.getContainerID(jobName, taskName),
-		"status":      getContainerStatus(globalIDMap.getContainerID(jobName, taskName)),
-	})
+	containerID := globalIDMap.getContainerID(jobName, taskName)
+	status := getContainerStatus(containerID)
+	switch status {
+	case "running":
+		c.JSON(http.StatusOK, gin.H{
+			"job":         jobName,
+			"task":        taskName,
+			"containerID": containerID,
+			"status":      status,
+		})
+	case "exited":
+		returnResult(c)
+	default:
+		c.JSON(http.StatusOK, gin.H{
+			"job":         jobName,
+			"task":        taskName,
+			"containerID": containerID,
+			"status":      status,
+		})
+	}
+
+}
+
+func returnResult(c *gin.Context) {
+	jobName := c.Param("job")
+	taskName := c.Param("task")
+
+	taskOutputDir := OutputFolder + "/" + jobName + "/" + taskName
+	archiveName := filepath.Base(taskOutputDir) + ".zip"
+	archivePath := filepath.Join(OutputFolder, jobName, archiveName)
+	cmd := exec.Command("zip", "-q", "-r", archiveName, taskOutputDir)
+
+	_, err := cmd.Output()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error: zip failed": err.Error()})
+		return
+	}
+	c.File(archivePath)
+	c.JSON(http.StatusOK, gin.H{"message": "Downloaded the file successfully: " + archiveName})
 }
 
 func getContainerStatus(containerID string) string {
@@ -121,5 +154,7 @@ func getContainerStatus(containerID string) string {
 	if err != nil {
 		return ""
 	}
-	return string(out)
+	status := string(out)
+
+	return status[:len(status)-1]
 }
