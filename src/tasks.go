@@ -44,13 +44,13 @@ func CreateTaskContainer(c *gin.Context) {
 	jobName := c.PostForm("job")
 	image := c.PostForm("image")
 
-	uploadDir := filepath.Join(UploadFolder, jobName)
-	if err := os.MkdirAll(uploadDir, 0755); err != nil {
+	jobDir := filepath.Join(InputFolder, jobName)
+	if err := os.MkdirAll(jobDir, 0755); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error1": err.Error()})
 		return
 	}
 
-	taskDir, err := uploadAndExtractToDir(c, uploadDir)
+	taskDir, err := uploadAndExtractToDir(c, jobDir)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error()})
 		return
