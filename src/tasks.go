@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"os/exec"
@@ -14,31 +15,6 @@ const (
 	containerOutputFolder = "/run/output"
 	containerSharedFolder = "/run/shared"
 )
-
-func launchContainer(imageName, job, task string) (string, error) {
-
-	// launches a container based on a task and an image
-
-	taskInputDir := InputFolder + "/" + job + "/" + task
-	taskOutputDir := OutputFolder + "/" + job + "/" + task
-
-	cmd := exec.Command("docker", "run", "-d", // Run in detached mode and remove container after it stops
-		"-v", taskInputDir+":"+containerInputFolder,
-		"-v", SharedFolder+":"+containerSharedFolder,
-		"-v", taskOutputDir+":"+containerOutputFolder,
-		imageName)
-
-	output, err := cmd.Output()
-	if err != nil {
-		return "", err
-	}
-
-	containerID := string(output)
-	containerID = containerID[:len(containerID)-1] // Remove newline character
-
-	return containerID, nil
-
-}
 
 func CreateTaskContainer(c *gin.Context) {
 	jobName := c.PostForm("job")
@@ -59,8 +35,8 @@ func CreateTaskContainer(c *gin.Context) {
 
 	containerID, err := launchContainer(image, jobName, taskName)
 	if err != nil {
-		getFileList(c, taskDir)
-		//c.JSON(http.StatusInternalServerError, gin.H{"error3": err.Error(), "dir": taskDir})
+		//getFileList(c, taskDir)
+		c.JSON(http.StatusInternalServerError, gin.H{"error3": err.Error(), "dir": taskDir})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -68,6 +44,31 @@ func CreateTaskContainer(c *gin.Context) {
 		"taskName":    taskName,
 		"status":      "created",
 	})
+}
+
+func launchContainer(imageName, job, task string) (string, error) {
+
+	// launches a container based on a task and an image
+
+	taskInputDir := InputFolder + "/" + job + "/" + task
+	taskOutputDir := OutputFolder + "/" + job + "/" + task
+
+	cmd := exec.Command("docker", "run", "-d", // Run in detached mode and remove container after it stops
+		"-v", taskInputDir+":"+containerInputFolder,
+		"-v", SharedFolder+":"+containerSharedFolder,
+		"-v", taskOutputDir+":"+containerOutputFolder,
+		imageName)
+
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("failed to launch container: %v", err)
+	}
+
+	containerID := string(output)
+	containerID = containerID[:len(containerID)-1] // Remove newline character
+
+	return containerID, nil
+
 }
 
 func getTask(c *gin.Context) {
