@@ -115,13 +115,8 @@ func getTask(c *gin.Context) {
 			"status":      status,
 		})
 	case "exited":
-		c.JSON(http.StatusOK, gin.H{
-			"job":         jobName,
-			"task":        taskName,
-			"containerID": containerID,
-			"status":      status,
-		})
-		//returnResult(c)
+
+		returnResult(c)
 	default:
 		c.JSON(http.StatusOK, gin.H{
 			"job":         jobName,
@@ -149,12 +144,12 @@ func returnResult(c *gin.Context) {
 		return
 	}
 
-	c.Header("Content-Description", "File Transfer")
-	c.Header("Content-Transfer-Encoding", "binary")
-	c.Header("Content-Disposition", "attachment; filename="+archiveName)
-	c.Header("Content-Type", "application/octet-stream")
-	c.File(archivePath)
-	//c.JSON(http.StatusOK, gin.H{"message": "Downloaded the file successfully: " + archiveName})
+	// c.Header("Content-Description", "File Transfer")
+	// c.Header("Content-Transfer-Encoding", "binary")
+	// c.Header("Content-Disposition", "attachment; filename="+archiveName)
+	// c.Header("Content-Type", "application/octet-stream")
+	// c.File(archivePath)
+	c.JSON(http.StatusOK, gin.H{"message": "Downloaded the file successfully: " + archiveName, "archivePath": archivePath})
 }
 
 func getContainerStatus(containerID string) string {
