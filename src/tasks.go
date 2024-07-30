@@ -141,12 +141,18 @@ func returnResult(c *gin.Context) {
 	taskName := c.Param("task")
 
 	// create output archive
-	taskOutputDir := OutputFolder + "/" + jobName + "/" + taskName
+	jobOutputDir := filepath.Join(OutputFolder, jobName)
+	err := os.Chdir(jobOutputDir)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error: chdir": err.Error()})
+		return
+	}
+	taskOutputDir := taskName
 	archiveName := filepath.Base(taskOutputDir) + ".zip"
 	archivePath := filepath.Join(OutputFolder, jobName, archiveName)
-	cmd := exec.Command("zip", "-q", "-r", archivePath, taskOutputDir)
+	cmd := exec.Command("zip", "-q", "-r", archiveName, taskName)
 	fmt.Print(archivePath)
-	_, err := cmd.Output()
+	_, err = cmd.Output()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error: zip failed": err.Error()})
 		return
