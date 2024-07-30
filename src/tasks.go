@@ -105,6 +105,14 @@ func getTask(c *gin.Context) {
 	jobName := c.Param("job")
 	taskName := c.Param("task")
 	containerID := globalIDMap.getContainerID(jobName, taskName)
+	if containerID == "" {
+		c.JSON(http.StatusNotFound, gin.H{
+			"job":   jobName,
+			"task":  taskName,
+			"error": "container not found",
+		})
+		return
+	}
 	status := getContainerStatus(containerID)
 	switch status {
 	case "running":
