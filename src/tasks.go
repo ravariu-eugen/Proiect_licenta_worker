@@ -131,6 +131,7 @@ func returnResult(c *gin.Context) {
 	jobName := c.Param("job")
 	taskName := c.Param("task")
 
+	// create output archive
 	taskOutputDir := OutputFolder + "/" + jobName + "/" + taskName
 	archiveName := filepath.Base(taskOutputDir) + ".zip"
 	archivePath := filepath.Join(OutputFolder, jobName, archiveName)
@@ -141,7 +142,12 @@ func returnResult(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error: zip failed": err.Error()})
 		return
 	}
-	c.FileAttachment(archivePath, archiveName)
+
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Disposition", "attachment; filename="+archiveName)
+	c.Header("Content-Type", "application/octet-stream")
+	c.File(archivePath)
 	//c.JSON(http.StatusOK, gin.H{"message": "Downloaded the file successfully: " + archiveName})
 }
 
