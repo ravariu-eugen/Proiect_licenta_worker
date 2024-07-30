@@ -137,7 +137,7 @@ func returnResult(c *gin.Context) {
 	archiveName := filepath.Base(taskOutputDir) + ".zip"
 	archivePath := filepath.Join(OutputFolder, jobName, archiveName)
 	cmd := exec.Command("zip", "-q", "-r", archiveName, taskOutputDir)
-
+	fmt.Print(archivePath)
 	_, err := cmd.Output()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error: zip failed": err.Error()})
@@ -149,7 +149,7 @@ func returnResult(c *gin.Context) {
 	// c.Header("Content-Disposition", "attachment; filename="+archiveName)
 	// c.Header("Content-Type", "application/octet-stream")
 	// c.File(archivePath)
-	getFileList(c, archivePath)
+	getFileList(c, OutputFolder)
 }
 
 func getContainerStatus(containerID string) string {
