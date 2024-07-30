@@ -115,7 +115,13 @@ func getTask(c *gin.Context) {
 			"status":      status,
 		})
 	case "exited":
-		returnResult(c)
+		c.JSON(http.StatusOK, gin.H{
+			"job":         jobName,
+			"task":        taskName,
+			"containerID": containerID,
+			"status":      status,
+		})
+		//returnResult(c)
 	default:
 		c.JSON(http.StatusOK, gin.H{
 			"job":         jobName,
