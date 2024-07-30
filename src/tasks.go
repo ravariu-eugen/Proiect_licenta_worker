@@ -144,12 +144,12 @@ func returnResult(c *gin.Context) {
 		return
 	}
 
-	// c.Header("Content-Description", "File Transfer")
-	// c.Header("Content-Transfer-Encoding", "binary")
-	// c.Header("Content-Disposition", "attachment; filename="+archiveName)
-	// c.Header("Content-Type", "application/octet-stream")
-	// c.File(archivePath)
-	getFileList(c, OutputFolder+"/"+jobName)
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Disposition", "attachment; filename="+archiveName)
+	c.Header("Content-Type", "application/octet-stream")
+	c.File(archivePath)
+	//getFileList(c, OutputFolder+"/"+jobName)
 }
 
 func getContainerStatus(containerID string) string {
