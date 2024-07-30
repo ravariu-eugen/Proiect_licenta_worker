@@ -136,7 +136,7 @@ func returnResult(c *gin.Context) {
 	taskOutputDir := OutputFolder + "/" + jobName + "/" + taskName
 	archiveName := filepath.Base(taskOutputDir) + ".zip"
 	archivePath := filepath.Join(OutputFolder, jobName, archiveName)
-	cmd := exec.Command("zip", "-q", "-r", archiveName, taskOutputDir)
+	cmd := exec.Command("zip", "-q", "-r", archivePath, taskOutputDir)
 	fmt.Print(archivePath)
 	_, err := cmd.Output()
 	if err != nil {
