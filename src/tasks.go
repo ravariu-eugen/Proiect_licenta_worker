@@ -149,7 +149,7 @@ func returnResult(c *gin.Context) {
 	// c.Header("Content-Disposition", "attachment; filename="+archiveName)
 	// c.Header("Content-Type", "application/octet-stream")
 	// c.File(archivePath)
-	getFileList(c, OutputFolder+"/"+jobName+"/"+taskName)
+	getFileList(c, OutputFolder+"/"+jobName)
 }
 
 func getContainerStatus(containerID string) string {
