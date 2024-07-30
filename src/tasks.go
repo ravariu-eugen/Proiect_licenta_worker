@@ -108,7 +108,7 @@ func getTask(c *gin.Context) {
 	status := getContainerStatus(containerID)
 	switch status {
 	case "running":
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusNoContent, gin.H{
 			"job":         jobName,
 			"task":        taskName,
 			"containerID": containerID,
@@ -118,7 +118,7 @@ func getTask(c *gin.Context) {
 
 		returnResult(c)
 	default:
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusNoContent, gin.H{
 			"job":         jobName,
 			"task":        taskName,
 			"containerID": containerID,
