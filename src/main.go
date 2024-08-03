@@ -30,6 +30,8 @@ func runContainerServer() error {
 	router.GET("/tasks/:job/:task", getTask)
 	router.POST("/tasks", CreateTaskContainer)
 
+	router.GET("/metrics", getMetrics)
+
 	return router.Run(":8080")
 }
 
