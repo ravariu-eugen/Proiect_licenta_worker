@@ -12,7 +12,7 @@ import (
 
 func getCPUUsageAndMemoryUtilization() (cpuUsage float64, memoryUtilization float64, err error) {
 	// Get CPU usage
-	cmd := exec.Command("mpstat", " 1 5 | awk 'END{print 100-$NF\" % \"}'")
+	cmd := exec.Command("bash", "-c", "mpstat -P ALL 1 5 | tail -n 1 | awk '{print 100-$NF\" % \"}'")
 	output, err := cmd.Output()
 	if err != nil {
 		return 0, 0, fmt.Errorf("failed to get CPU usage: %v", err)
