@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os/exec"
 	"strconv"
@@ -14,24 +15,24 @@ func getCPUUsageAndMemoryUtilization() (cpuUsage float64, memoryUtilization floa
 	cmd := exec.Command("mpstat", " 1 5 | awk 'END{print 100-$NF\" % \"}'")
 	output, err := cmd.Output()
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, fmt.Errorf("failed to get CPU usage: %v", err)
 	}
 	cpuUsageStr := strings.TrimSpace(string(output))
 	cpuUsage, err = strconv.ParseFloat(cpuUsageStr, 64)
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, fmt.Errorf("failed to parse CPU usage: %v", err)
 	}
 
 	// Get total memory utilization
 	cmd = exec.Command("sh", "-c", "top -bn1 | grep Mem | awk '{print $3}'")
 	output, err = cmd.Output()
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, fmt.Errorf("failed to get total memory utilization: %v", err)
 	}
 	memoryUtilizationStr := strings.TrimSpace(string(output))
 	memoryUtilization, err = strconv.ParseFloat(memoryUtilizationStr, 64)
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, fmt.Errorf("failed to parse total memory utilization: %v", err)
 	}
 
 	return cpuUsage, memoryUtilization, nil
