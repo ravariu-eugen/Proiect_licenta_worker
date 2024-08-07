@@ -63,11 +63,11 @@ func getMetrics(c *gin.Context) {
 		return
 	}
 
-	memoryUtilization, err := getemoryUtilization()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	// memoryUtilization, err := getemoryUtilization()
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	// 	return
+	// }
 
 	remainingStorage, err := getRemainingStorage()
 	if err != nil {
@@ -77,7 +77,7 @@ func getMetrics(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"cpuUsage":          cpuUsage,
-		"memoryUtilization": memoryUtilization,
+		"memoryUtilization": 0,
 		"remainingStorage":  remainingStorage,
 	})
 
