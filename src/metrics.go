@@ -42,14 +42,14 @@ func getCPUUsage() (float64, error) {
 	return cpuUsage, nil
 }
 
-func getRemainingStorage() (int64, error) {
+func getRemainingStorage() (float64, error) {
 	cmd := exec.Command("bash", "-c", "df -m / | tail -n 1 | awk '{print $4}'")
 	output, err := cmd.Output()
 	if err != nil {
 		return 0, fmt.Errorf("failed to get storage: %v", err)
 	}
 	remainingStorageStr := strings.TrimSpace(string(output))
-	remainingStorage, err := strconv.ParseInt(remainingStorageStr, 10, 64)
+	remainingStorage, err := strconv.ParseFloat(remainingStorageStr, 64)
 	if err != nil {
 		return 0, fmt.Errorf("failed to parse storage: %v", err)
 	}
@@ -77,9 +77,9 @@ func getMetrics(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"cpuUsage":          cpuUsage,
-		"memoryUtilization": memoryUtilization,
-		"remainingStorage":  remainingStorage,
+		"cpuUsage":         cpuUsage,
+		"memoryUsage":      memoryUtilization,
+		"remainingStorage": remainingStorage,
 	})
 
 }
