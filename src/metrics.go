@@ -57,12 +57,7 @@ func getRemainingStorage() (int64, error) {
 }
 
 func getMetrics(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"cpuUsage":          0,
-		"memoryUtilization": 0,
-		"remainingStorage":  0,
-	})
-	return
+
 	cpuUsage, err := getCPUUsage()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
