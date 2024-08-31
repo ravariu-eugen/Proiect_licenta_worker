@@ -38,7 +38,7 @@ func CreateTaskContainer(c *gin.Context) {
 
 	taskDir, err := uploadAndExtractToDir(c, jobDir)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error(), "mappings": "mappingsJson"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error(), "mappings": mappingJson})
 		return
 	}
 	taskName := filepath.Base(taskDir)
