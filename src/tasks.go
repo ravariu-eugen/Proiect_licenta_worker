@@ -49,7 +49,7 @@ func CreateTaskContainer(c *gin.Context) {
 	}
 	taskName := filepath.Base(taskDir)
 
-	entries, err := os.ReadDir("/app/shared")
+	entries, err := os.ReadDir("/app/shared/config1")
 	str := ""
 
 	for _, entry := range entries {
