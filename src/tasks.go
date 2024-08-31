@@ -48,10 +48,10 @@ func CreateTaskContainer(c *gin.Context) {
 	}
 	taskName := filepath.Base(taskDir)
 
-	containerID, err := launchContainer(image, jobName, taskName)
+	containerID, err := launchContainer(image, jobName, taskName, mappings)
 	if err != nil {
 		//getFileList(c, taskDir)
-		c.JSON(http.StatusInternalServerError, gin.H{"error3": err.Error(), "dir": taskDir})
+		c.JSON(http.StatusInternalServerError, gin.H{"error3": err.Error(), "dir": taskDir, "mappings": mappings})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -93,7 +93,7 @@ func (idMap IDMap) putContainerID(jobName, taskName, containerID string) {
 
 }
 
-func launchContainer(imageName, job, task string, mappings ...FileNameMapping) (string, error) {
+func launchContainer(imageName, job, task string, mappings []FileNameMapping) (string, error) {
 
 	// launches a container based on a task and an image
 
