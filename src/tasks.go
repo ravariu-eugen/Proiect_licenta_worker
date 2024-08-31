@@ -49,6 +49,13 @@ func CreateTaskContainer(c *gin.Context) {
 	}
 	taskName := filepath.Base(taskDir)
 
+	entries, err := os.ReadDir("/app/shared")
+	str := ""
+
+	for _, entry := range entries {
+		str += entry.Name()
+	}
+
 	containerID, err := launchContainer(image, jobName, taskName, mappings)
 	if err != nil {
 		//getFileList(c, taskDir)
@@ -60,6 +67,7 @@ func CreateTaskContainer(c *gin.Context) {
 			"jobName":  jobName,
 			"taskDir":  taskDir,
 			"jobDir":   jobDir,
+			"shared":   str,
 		})
 		return
 	}
