@@ -47,7 +47,7 @@ func uploadAndExtractToDir(c *gin.Context, destinationDir string) (string, error
 		if err := os.MkdirAll(destinationDir, 0755); err != nil {
 			return "", err
 		}
-		return filepath.Join(destinationDir, header.Filename), nil
+		return filepath.Join(destinationDir, "null"), nil
 	}
 
 	return extractMultipartFile(header, destinationDir)
