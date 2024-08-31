@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,6 +28,10 @@ func uploadFile(c *gin.Context, destinationDir string) (string, error) {
 
 }
 
+// uploadAndExtractToDir uploads a file to the server and extracts it to the specified directory.
+//
+// It takes a gin.Context and a destination directory as parameters.
+// Returns the path of the resulting directory and any error that occurred during the upload and extraction.
 func uploadAndExtractToDir(c *gin.Context, destinationDir string) (string, error) {
 	file, header, err := c.Request.FormFile("file")
 
@@ -34,6 +39,16 @@ func uploadAndExtractToDir(c *gin.Context, destinationDir string) (string, error
 		return "", err
 	}
 	defer file.Close()
+
+	// if the file is named "null", then there is no data
+	if header.Filename == "null" {
+
+		// create an empty directory
+		if err := os.MkdirAll(destinationDir, 0755); err != nil {
+			return "", err
+		}
+		return filepath.Join(destinationDir, header.Filename), nil
+	}
 
 	return extractMultipartFile(header, destinationDir)
 

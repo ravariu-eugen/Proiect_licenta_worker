@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -16,9 +17,18 @@ const (
 	containerSharedFolder = "/run/shared"
 )
 
+type FileNameMapping struct {
+	File string `json:"file"`
+	Name string `json:"name"`
+}
+
 func CreateTaskContainer(c *gin.Context) {
 	jobName := c.PostForm("job")
 	image := c.PostForm("image")
+	mappingJson := c.PostForm("mappings")
+
+	var mappings []FileNameMapping
+	err := json.Unmarshal([]byte(mappingJson), &mappings)
 
 	jobDir := filepath.Join(InputFolder, jobName)
 	if err := os.MkdirAll(jobDir, 0755); err != nil {
@@ -28,7 +38,7 @@ func CreateTaskContainer(c *gin.Context) {
 
 	taskDir, err := uploadAndExtractToDir(c, jobDir)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error(), "mappings": "mappingsJson"})
 		return
 	}
 	taskName := filepath.Base(taskDir)
@@ -52,6 +62,10 @@ type IDMap struct {
 
 var globalIDMap IDMap = IDMap{make(map[string]string)}
 
+// getContainerID retrieves the container ID associated with a specific job and task.
+//
+// jobName and taskName are used to construct the key for the ID map.
+// Returns the container ID as a string if found, otherwise an empty string.
 func (idMap IDMap) getContainerID(jobName, taskName string) (containerID string) {
 
 	key := jobName + "-" + taskName
@@ -63,6 +77,10 @@ func (idMap IDMap) getContainerID(jobName, taskName string) (containerID string)
 	return ""
 }
 
+// putContainerID maps a container ID to a job and task name.
+//
+// jobName and taskName are used to create a key for the mapping, and containerID is the value being mapped.
+// No return value.
 func (idMap IDMap) putContainerID(jobName, taskName, containerID string) {
 	key := jobName + "-" + taskName
 
@@ -70,7 +88,7 @@ func (idMap IDMap) putContainerID(jobName, taskName, containerID string) {
 
 }
 
-func launchContainer(imageName, job, task string) (string, error) {
+func launchContainer(imageName, job, task string, mappings ...FileNameMapping) (string, error) {
 
 	// launches a container based on a task and an image
 
@@ -81,11 +99,20 @@ func launchContainer(imageName, job, task string) (string, error) {
 		return "", err
 	}
 
-	cmd := exec.Command("docker", "run", "-d", // Run in detached mode and remove container after it stops
-		"-v", taskInputDir+":"+containerInputFolder,
-		"-v", SharedFolder+":"+containerSharedFolder,
-		"-v", taskOutputDir+":"+containerOutputFolder,
-		imageName)
+	argList := []string{"run", "-d", // Run in detached mode and remove container after it stops
+		"-v", taskInputDir + ":" + containerInputFolder,
+		"-v", taskOutputDir + ":" + containerOutputFolder,
+	}
+
+	for _, mapping := range mappings {
+		localFileDir := SharedFolder + "/" + getFileNameWithoutExt(mapping.File)
+		containerFileDir := containerSharedFolder + "/" + mapping.Name
+		argList = append(argList, "-v", localFileDir+":"+containerFileDir)
+	}
+
+	argList = append(argList, imageName)
+
+	cmd := exec.Command("docker", argList...)
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -164,6 +191,17 @@ func returnResult(c *gin.Context) {
 	c.Header("Content-Type", "application/octet-stream")
 	c.File(archivePath)
 	//getFileList(c, OutputFolder+"/"+jobName)
+}
+
+func clearTask(jobName, taskName string) {
+
+}
+
+func removeImage(imageName string) error {
+	cmd := exec.Command("docker", "image", "rm", imageName)
+
+	_, err := cmd.Output()
+	return err
 }
 
 func getContainerStatus(containerID string) string {
