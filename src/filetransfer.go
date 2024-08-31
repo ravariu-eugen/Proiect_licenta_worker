@@ -41,7 +41,7 @@ func uploadAndExtractToDir(c *gin.Context, destinationDir string) (string, error
 	defer file.Close()
 
 	// if the file is named "null", then there is no data
-	if header.Filename == "null" {
+	if header.Filename == "null.zip" {
 
 		// create an empty directory
 		if err := os.MkdirAll(destinationDir, 0755); err != nil {
