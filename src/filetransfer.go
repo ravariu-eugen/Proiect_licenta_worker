@@ -44,7 +44,7 @@ func uploadAndExtractToDir(c *gin.Context, destinationDir string) (string, error
 	if header.Filename == "null.zip" {
 
 		// create an empty directory
-		if err := os.MkdirAll(destinationDir, 0755); err != nil {
+		if err := os.MkdirAll(filepath.Join(destinationDir, "null"), 0755); err != nil {
 			return "", err
 		}
 		return filepath.Join(destinationDir, "null"), nil
