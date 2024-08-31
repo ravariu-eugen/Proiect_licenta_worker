@@ -29,6 +29,10 @@ func CreateTaskContainer(c *gin.Context) {
 
 	var mappings []FileNameMapping
 	err := json.Unmarshal([]byte(mappingJson), &mappings)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error0": err.Error()})
+		return
+	}
 
 	jobDir := filepath.Join(InputFolder, jobName)
 	if err := os.MkdirAll(jobDir, 0755); err != nil {
@@ -38,7 +42,8 @@ func CreateTaskContainer(c *gin.Context) {
 
 	taskDir, err := uploadAndExtractToDir(c, jobDir)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error(), "mappings": mappingJson})
+		_, he, _ := c.Request.FormFile("file")
+		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error(), "mappings": mappingJson, "task": he.Filename})
 		return
 	}
 	taskName := filepath.Base(taskDir)
