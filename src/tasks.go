@@ -129,7 +129,7 @@ func launchContainer(imageName, job, task string, mappings []FileNameMapping) (s
 
 	output, err := cmd.Output()
 	if err != nil {
-		return "", fmt.Errorf("failed to launch container: %s %v", strings.Join(argList, "|"), err)
+		return "", fmt.Errorf("failed to launch container: (%s %v)", strings.Join(argList, " "), err)
 	}
 
 	containerID := string(output)
