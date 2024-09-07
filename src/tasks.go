@@ -49,7 +49,7 @@ func CreateTaskContainer(c *gin.Context) {
 	}
 	taskName := filepath.Base(taskDir)
 
-	entries, err := os.ReadDir("/app/shared/config1")
+	entries, err := os.ReadDir("/app/shared")
 	str := ""
 
 	for _, entry := range entries {
@@ -121,14 +121,14 @@ func launchContainer(imageName, job, task string, mappings []FileNameMapping) (s
 	}
 
 	argList := []string{"run", "-d", // Run in detached mode and remove container after it stops
-		"-v", taskInputDir + ":" + containerInputFolder,
+		"-v", taskInputDir + ":" + containerInputFolder + ":ro",
 		"-v", taskOutputDir + ":" + containerOutputFolder,
 	}
 
 	for _, mapping := range mappings {
 		localFileDir := SharedFolder + "/" + getFileNameWithoutExt(mapping.File)
 		containerFileDir := containerSharedFolder + "/" + mapping.Name
-		argList = append(argList, "-v", localFileDir+":"+containerFileDir)
+		argList = append(argList, "-v", localFileDir+":"+containerFileDir+":ro")
 	}
 
 	argList = append(argList, imageName)
